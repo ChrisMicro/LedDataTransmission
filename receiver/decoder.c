@@ -1,14 +1,14 @@
 /*
 ============================================================================
 
-Name : decoder.c
-Author : ChrisMicro
+Name :      decoder.c
+Author :    ChrisMicro
 Version :
 Copyright : GPL license 3
-                           ( chris (at) roboterclub-freiburg.de )
-Date : Janurary 2014
 
-Description : Data transmission by a LED.
+Date :      Janurary 2014
+
+Description : data decoder for FSK coded signals from a digital input pin
 
 ============================================================================
 */
@@ -16,7 +16,7 @@ Description : Data transmission by a LED.
 	Supported Microcontrollers:
 	Atmega88, Atmega168, Atmega328
 
-	uses counter TCC2
+//	uses counter TCC2
 
  */
 #include "platform.h"
