@@ -1,12 +1,12 @@
 /*
 ============================================================================
 
-Name : ledDebug.c
-Author : ChrisMicro
+Name :       ledDebug.c
+Author :     ChrisMicro
 Version :
-Copyright : GPL license 3
-                           ( chris (at) roboterclub-freiburg.de )
-Date : Janurary 2014
+Copyright :  GPL license 3
+
+Date :       Janurary 2014
 
 Description : Data transmission by a LED.
 
@@ -24,15 +24,16 @@ Description : Data transmission by a LED.
 
  */
 #include "stdint.h"
-
 #include "platform.h"
-
 #include "signal.h"
+#include "mc_io.h"
 
 void setup()
 {
 	initLed();
 }
+
+uint8_t Data[]={ 0,0xff,0,0xaa,0x55,0,1,2,3,4,0x80 };
 
 void loop()
 {
@@ -42,7 +43,7 @@ void loop()
 	ledOff();
 	delay(100);
 
-	sendDataFSK();
+	sendDataFrame(Data,sizeof(Data));
 	Data[2]++; // just to test: increment third byte in data stream
 }
 

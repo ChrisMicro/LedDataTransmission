@@ -1,14 +1,14 @@
 /*
 ============================================================================
 
-Name : platform.h
-Author : ChrisMicro
+Name :        platform.h
+Author :      ChrisMicro
 Version :
-Copyright : GPL license 3
-                           ( chris (at) roboterclub-freiburg.de )
-Date : Janurary 2014
+Copyright :   GPL license 3
 
-Description : Data transmission by a LED.
+Date :        Janurary 2014
+
+Description : Platform ( mikrocontroller setup )
 
 ============================================================================
 */
@@ -20,9 +20,9 @@ extern "C"
 #ifndef __PLATFORM__
 #define __PLATFORM__
 
-
-	#define ATMEGA_88_168_328
-	// #define Arduino
+	#define ATTINY_13
+	//#define ATMEGA_88_168_328
+	//#define ARDUINO
 
 #endif // __PLATFORM__
 
