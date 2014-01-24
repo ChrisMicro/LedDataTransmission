@@ -5,10 +5,10 @@
 /*
 ============================================================================
 
-Name : ledDebugReceiver.cpp
-Author : ChrisMicro
+Name :          ledDebugReceiver.cpp
+Author :        ChrisMicro
 Version :
-Copyright : GPL license 3
+Copyright :     GPL license 3
                            ( chris (at) roboterclub-freiburg.de )
 Date : Janurary 2014
 
@@ -21,11 +21,15 @@ Description : 	Data transmission by a LED.
  	Platform: Arduino Uno
  */
 #include "decoder.h"
+#include "adc.h"
+#include "filter.h"
 
 void setup()
 {
 	initLed();
 	initPort();
+	adc_init();
+
 	Serial.begin(9600);
     Serial.println("LED data transmission receiver");
 
@@ -44,13 +48,28 @@ uint8_t FrameData[FRAMESIZE];
 
 void loop()
 {
+	//analogRead(analogInPin);
 	uint8_t n;
-
-	ledOn();
-	delay(500);
-	ledOff();
-	delay(500);
-
+	Serial.println("--");
+/*
+	// ADC test
+	while(1)
+	{
+		if(DCremovedPinValue(0)==0)ledOn();
+		else ledOff();
+	}
+	while(1)
+	{
+		ledOn();
+		//delay(500);
+		ledOff();
+		//delay(500);
+		uint16_t x;
+		x=adc_read(0);
+		Serial.print(x);Serial.print("\t");
+		//Serial.println(AC_signal(x));
+		Serial.println(DCremovedPinValue(0));
+	}*/
 	//Serial.println("edge debug, infinite loop, signal out to led");
 	//edgeDebug();
 	//Serial.println("frame start");

@@ -1,12 +1,12 @@
 /*
 ============================================================================
 
-Name : decoder.h
-Author : ChrisMicro
+Name :      decoder.h
+Author :    ChrisMicro
 Version :
 Copyright : GPL license 3
                            ( chris (at) roboterclub-freiburg.de )
-Date : Janurary 2014
+Date :      Janurary 2014
 
 Description : Data transmission by a LED.
 
@@ -23,6 +23,13 @@ extern "C"
 
 #ifndef __DECODER_
 #define __DECODER_
+
+	// you can use the adc sitnal as input
+	// this will enable DC suppression without
+	// external capacitor
+	// ADC-sampling is slower than direct
+	// digital pin sampling
+	#define INPUTFROMADC
 
 	#define DEBUGLED 5
 	//#define DEBUGLED 4
@@ -53,6 +60,7 @@ extern "C"
 
 #else
 	#include "Arduino.h"
+#include "adc.h"
 
 	#define ARDUINOLED 13
 	#define HALFBITDELAY delayMicroseconds(1e6/BAUD/2)
@@ -63,7 +71,12 @@ extern "C"
 
 	inline void initPort(){pinMode(12, INPUT);}
 	#define INPUTAUDIOPIN (1<<PB4) // PB4 is Arduino Pin Number 12
-	#define PINVALUE (PINB&INPUTAUDIOPIN)
+
+	#ifdef INPUTFROMADC
+		#define PINVALUE DCremovedPinValue(0)
+	#else
+		#define PINVALUE (PINB&INPUTAUDIOPIN)
+	#endif
 
 	#define PINLOW (PINVALUE==0)
 	#define PINHIGH (!PINLOW)
