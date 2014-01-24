@@ -29,7 +29,7 @@ extern "C"
 	// external capacitor
 	// ADC-sampling is slower than direct
 	// digital pin sampling
-	#define INPUTFROMADC
+	//#define INPUTFROMADC
 
 	#define DEBUGLED 5
 	//#define DEBUGLED 4
