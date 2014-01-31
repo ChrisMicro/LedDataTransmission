@@ -25,7 +25,6 @@ Description : data transmission signal generator
     input: bit to be send
 
 ***************************************************************************************/
-#define BITTIME_US 1e6/BAUD
 
 void sendFskBit(uint8_t bitval)
 {

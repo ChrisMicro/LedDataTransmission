@@ -23,7 +23,8 @@ extern "C"
 
 	#include "stdint.h"
 
-	#define BAUD 4800
+	#define BAUD 2000
+	#define BITTIME_US 1e6/BAUD
 
 	void sendDataFrame(uint8_t *, uint8_t);
 

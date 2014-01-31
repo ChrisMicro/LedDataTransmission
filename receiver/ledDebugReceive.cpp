@@ -23,6 +23,10 @@ Description : 	Data transmission by a LED.
 #include "decoder.h"
 #include "adc.h"
 #include "filter.h"
+#define LED0 8
+#define LED1 9
+#define LED2 10
+#define LED3 11
 
 void setup()
 {
@@ -42,6 +46,13 @@ void setup()
     // = 1024us
 
     TCCR2B= _BV(CS22);
+
+  // initialize the digital pin as an output.
+
+  pinMode(LED0, OUTPUT);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
 }
 
 uint8_t FrameData[FRAMESIZE];
@@ -83,6 +94,21 @@ void loop()
 	{
 
 		receiveFrame(FrameData);
+#ifdef TESTPRINT
+
+
+#else
+	uint8_t z;
+	z=FrameData[2];
+	  if(z&0x01)digitalWrite(LED0,HIGH);
+	  else digitalWrite(LED0,LOW);
+	  if(z&0x02)digitalWrite(LED1,HIGH);
+	  else digitalWrite(LED1,LOW);
+	  if(z&0x04)digitalWrite(LED2,HIGH);
+	  else digitalWrite(LED2,LOW);
+	  if(z&0x08)digitalWrite(LED3,HIGH);
+	  else digitalWrite(LED3,LOW);
+#endif
 		for(n=0;n<FRAMESIZE;n++)
 		{
 			Serial.print(FrameData[n],HEX);
@@ -90,7 +116,6 @@ void loop()
 		}
 		Serial.print(  " low: ");	Serial.print(BitTimeLow);
 		Serial.print("\t high: ");	Serial.println(BitTimeHigh);
-
 	}
 }
 

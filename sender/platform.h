@@ -20,8 +20,8 @@ extern "C"
 #ifndef __PLATFORM__
 #define __PLATFORM__
 
-	#define ATTINY_13
-	//#define ATMEGA_88_168_328
+	//#define ATTINY_13
+	#define ATMEGA_88_168_328
 	//#define ARDUINO
 
 #endif // __PLATFORM__
