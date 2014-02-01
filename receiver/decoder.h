@@ -23,7 +23,7 @@ extern "C"
 
 #ifndef __DECODER_
 #define __DECODER_
-
+	#include "stdint.h"
 	// you can use the adc sitnal as input
 	// this will enable DC suppression without
 	// external capacitor
@@ -36,6 +36,8 @@ extern "C"
 
 	#define BAUD 4800
 	#define TIMER TCNT2 // we use timer2 for measuring time
+
+	extern uint8_t HighTakesLonger;
 
 #ifdef ATMEGA_88_168_328
 /*
@@ -65,11 +67,6 @@ extern "C"
 	#define ARDUINOLED 13
 	#define HALFBITDELAY delayMicroseconds(1e6/BAUD/2)
 
-	inline void ledOn(){digitalWrite(ARDUINOLED, HIGH);}
-	inline void ledOff()  {digitalWrite(ARDUINOLED, LOW);}
-	inline void initLed(){pinMode(ARDUINOLED, OUTPUT);}
-
-	inline void initPort(){pinMode(12, INPUT);}
 	#define INPUTAUDIOPIN (1<<PB4) // PB4 is Arduino Pin Number 12
 
 	#ifdef INPUTFROMADC

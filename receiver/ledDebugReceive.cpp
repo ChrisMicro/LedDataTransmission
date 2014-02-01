@@ -23,36 +23,62 @@ Description : 	Data transmission by a LED.
 #include "decoder.h"
 #include "adc.h"
 #include "filter.h"
+
+#include "mc_io.h"
+#include "decoderStateMachine.h"
+#include "stdlib.h"
 #define LED0 8
 #define LED1 9
 #define LED2 10
 #define LED3 11
 
+extern "C"
+{
+	inline void ledOn(){digitalWrite(ARDUINOLED, HIGH);}
+	inline void ledOff()  {digitalWrite(ARDUINOLED, LOW);}
+	inline void initLed(){pinMode(ARDUINOLED, OUTPUT);}
+	void toggleLed()
+	{
+		static int state=0;
+		if(state==0) digitalWrite(ARDUINOLED, LOW);
+		else digitalWrite(ARDUINOLED, HIGH);
+		state^=0x01;
+	}
+	void SystemOutText(char * str){
+		Serial.println(str);
+	}
+
+	void SystemOutDec(char* text, int value)
+	{
+		Serial.print(text);Serial.println(value);
+	}
+}
+
 void setup()
 {
 	initLed();
-	initPort();
+	//initPort();
 	adc_init();
 
 	Serial.begin(9600);
-    Serial.println("LED data transmission receiver");
+	Serial.println("LED data transmission receiver");
 
-    // Timer 2 normal mode, clk/8, count up from 0 to 255
-    // ==> timer overflow frequency @16MHz= 16MHz/8/256=7812.5Hz
-    // = 128us
-    //TCCR2B= _BV(CS21);
-    // Timer 2 normal mode, clk/64, count up from 0 to 255
-    // ==> timer overflow frequency @16MHz= 16MHz/64/256=970,56Hz
-    // = 1024us
+	// Timer 2 normal mode, clk/8, count up from 0 to 255
+	// ==> timer overflow frequency @16MHz= 16MHz/8/256=7812.5Hz
+	// = 128us
+	//TCCR2B= _BV(CS21);
+	// Timer 2 normal mode, clk/64, count up from 0 to 255
+	// ==> timer overflow frequency @16MHz= 16MHz/64/256=970,56Hz
+	// = 1024us
 
-    TCCR2B= _BV(CS22);
+	TCCR2B= _BV(CS22);
 
-  // initialize the digital pin as an output.
+	// initialize the digital pin as an output.
 
-  pinMode(LED0, OUTPUT);
-  pinMode(LED1, OUTPUT);
-  pinMode(LED2, OUTPUT);
-  pinMode(LED3, OUTPUT);
+	pinMode(LED0, OUTPUT);
+	pinMode(LED1, OUTPUT);
+	pinMode(LED2, OUTPUT);
+	pinMode(LED3, OUTPUT);
 }
 
 uint8_t FrameData[FRAMESIZE];
@@ -88,11 +114,18 @@ void loop()
 	//Serial.println("syncDebug");
 	//syncDebug();
 
-	Serial.println("waitn for data .... timer counts for low and high signal");
+	//Serial.println("waitn for data .... timer counts for low and high signal");
+	Serial.println("wait ...");
+
+	while(BrEstimationStateMachine(START)!=M1_READY);
+
+	SystemOutDec("low: ",BitTimeLow/(16e6/64)*1e6);
+	SystemOutDec("    high: ",BitTimeHigh/(16e6/64)*1e6);
+
+
 	delay(1000);
 	while(1)
 	{
-
 		receiveFrame(FrameData);
 #ifdef TESTPRINT
 

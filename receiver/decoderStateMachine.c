@@ -22,6 +22,8 @@ Description : data decoder for FSK realized as state machine
 #include "platform.h"
 #include "decoder.h"
 #include "stdint.h"
+#include "decoderStateMachine.h"
+
 
 /***************************************************************************************
 
@@ -41,32 +43,20 @@ Description : data decoder for FSK realized as state machine
 				uint8_t HighTakesLonger
 
 ***************************************************************************************/
-#define SYNCCOUNTER 12 // minimum number of bits which should have equal duration
-
-#define VOID 0
-#define START 1
-
-// state machine 1 state definitons
-#define M1_READY   0
-#define M1_PINLOW  1	// pin low state from machine 1
-#define M1_PINHIGH 2	// pin high state from machine 1
-
-typedef uint8_t state_t;
-typedef uint8_t command_t;
 
 state_t BrEstimationStateMachine(command_t command)
 {
 	static state_t state=M1_READY;
 
-	static uint16_t counter;
+	static uint16_t counter=0,t_old=0;
 
-	uint8_t p,t_old=0,tolerance;
+	uint8_t p,tolerance;
 
-	counter=0;
 
 	switch(state)
 	{
 		case M1_READY:{
+
 			if(command==START)
 			{
  				counter=0;
@@ -77,6 +67,7 @@ state_t BrEstimationStateMachine(command_t command)
 		}break;
 
 		case M1_PINLOW:{
+
 			if(PINHIGH)
 			{
 				BitTimeLow=TIMER;
@@ -88,6 +79,7 @@ state_t BrEstimationStateMachine(command_t command)
 		}break;
 
 		case M1_PINHIGH:{
+
 			if(PINLOW)
 			{
 				BitTimeHigh=TIMER;
@@ -101,12 +93,15 @@ state_t BrEstimationStateMachine(command_t command)
 				{
 					counter ++ ;
 					//toggleLed(); // debug
+
 				}
 				else
 				{
 					counter=0;
 				}
+
 				t_old=BitTimeHigh;
+
 				if (counter>=SYNCCOUNTER)
 				{
 					state=M1_READY; 					// ======> all sync bits received
@@ -120,49 +115,3 @@ state_t BrEstimationStateMachine(command_t command)
 	}
 	return state;
 }
-/*
-void bitRateEstimation()
-{
-	  uint16_t counter=0;
-
-	  uint8_t p,t_old=0,tolerance;
-
-	  //*** synchronisation and bit rate estimation **************************
-
-	  counter=0;
-
-	  while(counter<SYNCCOUNTER)
-	  {
-
-		while(PINLOW);				// wait for high
-		BitTimeLow=TIMER;
-		TIMER=0; // reset timer
-		p=PINVALUE;
-
-
-		while(p==PINVALUE);			// wait for edge
-		BitTimeHigh=TIMER;
-		TIMER=0; // reset timer
-		p=PINVALUE;
-
-		tolerance=BitTimeHigh>>2; // 1/4 t
-
-		// check if t is close to t_old
-		if( ( t_old>(BitTimeHigh-tolerance)) && (t_old<(BitTimeHigh+tolerance)) )
-		{
-			counter ++ ;
-			//toggleLed(); // debug
-		}
-		else
-		{
-			counter=0;
-		}
-		t_old=BitTimeHigh;
-	  }
-
-	  HighTakesLonger=false;
-	  if(BitTimeHigh>BitTimeLow)HighTakesLonger=true;
-
-}
-*/
-

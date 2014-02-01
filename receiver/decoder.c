@@ -22,14 +22,7 @@ Description : data decoder for FSK coded signals from a digital input pin
 #include "platform.h"
 #include "decoder.h"
 #include "stdint.h"
-
-void toggleLed()
-{
-        static int state=0;
-        if(state==0) ledOff();
-        else ledOn();
-        state^=0x01;
-}
+#include "mc_io.h"
 
 // debug pulse
 void pulse()
@@ -41,7 +34,7 @@ void pulse()
 uint8_t BitTimeLow=0;
 uint8_t BitTimeHigh=0;
 
-static uint8_t HighTakesLonger=0;
+uint8_t HighTakesLonger=0;
 
 /***************************************************************************************
 
