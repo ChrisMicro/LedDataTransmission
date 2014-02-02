@@ -1,3 +1,20 @@
+/*
+============================================================================
+
+Name :      adc.c
+Author :    ChrisMicro
+Version :
+Copyright : GPL license 3
+
+Date :      Janurary 2014
+
+Description : analog to digital converter
+              This implements a faster ADC than in the standard Arduino libs
+
+Hardware:     Atmega328p
+
+============================================================================
+*/
 #include "adc.h"
 #include "filter.h"
 
@@ -42,7 +59,16 @@ uint16_t adc_read(uint8_t channel)
 
 	return ADC;
 }
+/***************************************************************************************
 
+	uint8_t DCremovedPinValue(uint8_t channel)
+
+    This routine subtracts the DC-Value of the ADC-signal and returns low or high value.
+
+	input:      adc-channel
+	output: 	low/high
+
+***************************************************************************************/
 uint8_t DCremovedPinValue(uint8_t channel)
 {
 	uint16_t x=adc_read(channel);

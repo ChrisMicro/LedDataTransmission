@@ -97,23 +97,23 @@ void bitRateEstimation()
 
         highBitReceived()
 
-receive one bit
-Depending on the results of the bit rate estimation
+        receive one bit
+        Depending on the results of the bit rate estimation
 
-input:         lobal variables from bit rate estimation BitTimeLow, BitTimeHigh duration
-                and if the BitTimeHigh duration takes longer than the BitTimeLow duration
-                ( HighTakesLonger ), one bit is decoded
+ input: lobal variables from bit rate estimation BitTimeLow, BitTimeHigh duration
+        and if the BitTimeHigh duration takes longer than the BitTimeLow duration
+        ( HighTakesLonger ), one bit is decoded
 
-        output:         flag=1 if bit is HIGH
-                                flag=0 if bit is LOW
+output: flag=1 if bit is HIGH
+        flag=0 if bit is LOW
 
 ***************************************************************************************/
 uint8_t highBitReceived()
 {
         static uint8_t p,t,tolerance;
 
-        if(HighTakesLonger)        while(PINLOW);                        // wait for high
-        else                        while(PINHIGH);                                // wait for low
+        if(HighTakesLonger)        while(PINLOW);  // wait for high
+        else                       while(PINHIGH); // wait for low
 
         t=TIMER;
         TIMER=0; // reset timer

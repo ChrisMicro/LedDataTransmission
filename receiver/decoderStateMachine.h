@@ -22,7 +22,11 @@ extern "C"
 	typedef uint8_t state_t;
 	typedef uint8_t command_t;
 
+	enum bitState { BITREADY,BITSTATE1,BITSTATE2 };
+	extern uint8_t BitValue;
+
 	state_t BrEstimationStateMachine(command_t command);
+	enum bitState highBitReceived_S(void);
 
 #endif // __DECODERSTATEMACHINE__
 

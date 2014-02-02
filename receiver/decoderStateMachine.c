@@ -115,3 +115,75 @@ state_t BrEstimationStateMachine(command_t command)
 	}
 	return state;
 }
+/***************************************************************************************
+
+        highBitReceived_S()
+
+
+
+***************************************************************************************/
+//enum bitState { BITREADY,BITSTATE1,BITSTATE2 };
+uint8_t BitValue=true;
+
+enum bitState highBitReceived_S()
+{
+        static uint8_t p,t,tolerance;
+
+        static enum bitState state;
+
+        switch(state)
+        {
+        	case BITREADY:{
+        		state=BITSTATE1;  					//==> BITSTATE1
+        	}// attention: fallthru !
+        	case BITSTATE1:{
+        		BitValue=false;
+                if(HighTakesLonger)
+                {
+                	// wait for high
+                	if(PINHIGH)
+                	{
+                        t=TIMER;
+                        TIMER=0; // reset timer
+                        p=PINVALUE;
+                		state=BITSTATE2; 	        //==> BITSTATE2
+
+                	}
+                }
+                else
+                {
+                    // wait for low
+                	if(PINLOW)
+                	{
+                		t=TIMER;
+                		TIMER=0; // reset timer
+                		p=PINVALUE;
+                		state=BITSTATE2;            //==> BITSTATE2
+                	}
+                }
+        	}break;
+        	case BITSTATE2:{
+                if(p!=PINVALUE)                // wait for edge
+                {
+                	t=TIMER;
+                    TIMER=0; // reset timer
+                    p=PINVALUE;
+                    //SystemOutDec("t: ",t);
+                    if(HighTakesLonger)
+                    {
+                            tolerance=(BitTimeHigh>>2);
+                            if(t>(BitTimeHigh+tolerance)) BitValue=true;
+
+                    }else
+                    {
+                            tolerance=(BitTimeLow>>2);
+                            if(t>(BitTimeLow+tolerance)) BitValue=true;
+                    }
+                    state=BITREADY;                 //==> BITSTATE2
+                }
+        	}break;
+        	default: state=BITREADY;
+        }
+        return state;
+}
+

@@ -1,6 +1,5 @@
 #include "filter.h"
 
-
 // y2=a*x+(1-a)*y1, a in 1/65536
 // Filter += (ADC Wert-Filter) / K;
 // K * Abtastzeit = Zeitkonstate des Filters 1. Ordnung.

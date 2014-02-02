@@ -118,9 +118,15 @@ void loop()
 	Serial.println("wait ...");
 
 	while(BrEstimationStateMachine(START)!=M1_READY);
-
 	SystemOutDec("low: ",BitTimeLow/(16e6/64)*1e6);
 	SystemOutDec("    high: ",BitTimeHigh/(16e6/64)*1e6);
+	while(1)
+	{
+		//while(highBitReceived_S()!=BITREADY)delayMicroseconds(30);
+		while(highBitReceived_S()!=BITREADY);
+		SystemOutDec("BitValue",BitValue);
+	}
+
 
 
 	delay(1000);
