@@ -34,9 +34,9 @@ Description : 	Data transmission by a LED.
 
 extern "C"
 {
-	inline void ledOn(){digitalWrite(ARDUINOLED, HIGH);}
-	inline void ledOff()  {digitalWrite(ARDUINOLED, LOW);}
-	inline void initLed(){pinMode(ARDUINOLED, OUTPUT);}
+	void ledOn(){digitalWrite(ARDUINOLED, HIGH);}
+	void ledOff()  {digitalWrite(ARDUINOLED, LOW);}
+	void initLed(){pinMode(ARDUINOLED, OUTPUT);}
 	void toggleLed()
 	{
 		static int state=0;
@@ -81,7 +81,7 @@ void setup()
 	pinMode(LED3, OUTPUT);
 }
 
-uint8_t FrameData[FRAMESIZE];
+
 
 void loop()
 {
@@ -118,13 +118,69 @@ void loop()
 	Serial.println("wait ...");
 
 	while(BrEstimationStateMachine(START)!=M1_READY);
-	SystemOutDec("low: ",BitTimeLow/(16e6/64)*1e6);
-	SystemOutDec("    high: ",BitTimeHigh/(16e6/64)*1e6);
+	SystemOutDec("low count: ",BitTimeLow);
+	SystemOutDec("    high count: ",BitTimeHigh);
+	SystemOutDec("low us: ",BitTimeLow/(16e6/64)*1e6);
+	//SystemOutDec("    high us: ",BitTimeHigh/(16e6/64)*1e6);
+	while(1)
+	{
+		while(receiveFrame_S()!=FRAMEREADY);
+		if(FrameError!=FRAMEOK) Serial.println("Frame Timeout");
+		for(n=0;n<10;n++){
+			Serial.print(FrameData[n],HEX);Serial.print(" ");
+		}
+		Serial.println(" ");
+	}
 	while(1)
 	{
 		//while(highBitReceived_S()!=BITREADY)delayMicroseconds(30);
-		while(highBitReceived_S()!=BITREADY);
-		SystemOutDec("BitValue",BitValue);
+		while(BrEstimationStateMachine(START)!=M1_READY);
+/*
+		ledOn();
+		//delayMicroseconds(100);
+		ledOff();
+		for(n=0;n<80;n++)
+		{
+
+			while(highBitReceived_S()!=BITREADY);
+			ledOn();
+			//delayMicroseconds(100);
+			ledOff();
+		}*/
+		//SystemOutText("wait for byte");
+		for(n=0;n<10;n++){
+			while(receiveByte_S()!=BYTEREADY);
+			FrameData[n]=ReceiverData;
+			//if(ReceiverData!=0)Serial.println("-----------------");
+		}
+		for(n=0;n<10;n++){
+			Serial.print(FrameData[n],HEX);Serial.print(" ");
+		}
+
+		Serial.println(" ");
+/*
+		BitValue=0;
+		while(BitValue!=1)
+		{
+			while(highBitReceived_S()!=BITREADY);
+			//if(BitError==BITOK)
+			//{
+				if(BitValue==1)
+				{
+					ledOn();
+					delayMicroseconds(100);
+					ledOff();
+				}
+		}*/
+		/*
+		if(BitError!=0) {
+			SystemOutDec("       ERROR:",(uint8_t)BitError);
+		}
+		else{
+			SystemOutDec("BitValue: ",BitValue);
+		}
+		*/
+		BitError=BITOK;
 	}
 
 

@@ -23,6 +23,7 @@ Description : data decoder for FSK realized as state machine
 #include "decoder.h"
 #include "stdint.h"
 #include "decoderStateMachine.h"
+#include "mc_io.h"
 
 
 /***************************************************************************************
@@ -117,27 +118,35 @@ state_t BrEstimationStateMachine(command_t command)
 }
 /***************************************************************************************
 
-        highBitReceived_S()
+   highBitReceived_S()
 
-
+   output:  state ( BITREADY when bit received )
 
 ***************************************************************************************/
 //enum bitState { BITREADY,BITSTATE1,BITSTATE2 };
-uint8_t BitValue=true;
+//enum bitError { BITOK=0,TIMEOUT=1,TOSHORT };
+
+uint8_t BitValue=0;
+uint8_t BitError=BITOK;
+#define TIMEOUTCYCLES 10000
 
 enum bitState highBitReceived_S()
 {
         static uint8_t p,t,tolerance;
 
         static enum bitState state;
+        static uint16_t timeOutCounter;
 
         switch(state)
         {
         	case BITREADY:{
+        		timeOutCounter=0;
         		state=BITSTATE1;  					//==> BITSTATE1
         	}// attention: fallthru !
         	case BITSTATE1:{
-        		BitValue=false;
+        		BitValue=0;
+        		//BitError=BITOK;
+
                 if(HighTakesLonger)
                 {
                 	// wait for high
@@ -147,7 +156,6 @@ enum bitState highBitReceived_S()
                         TIMER=0; // reset timer
                         p=PINVALUE;
                 		state=BITSTATE2; 	        //==> BITSTATE2
-
                 	}
                 }
                 else
@@ -163,7 +171,7 @@ enum bitState highBitReceived_S()
                 }
         	}break;
         	case BITSTATE2:{
-                if(p!=PINVALUE)                // wait for edge
+                if(p!=PINVALUE) // wait for edge
                 {
                 	t=TIMER;
                     TIMER=0; // reset timer
@@ -172,18 +180,143 @@ enum bitState highBitReceived_S()
                     if(HighTakesLonger)
                     {
                             tolerance=(BitTimeHigh>>2);
-                            if(t>(BitTimeHigh+tolerance)) BitValue=true;
-
+                            if(t>(BitTimeHigh+tolerance)) BitValue=1;
+                            if(t< ( BitTimeHigh>>1) ) BitError=TOSHORT;//SystemOutDec("to short",t);
                     }else
                     {
                             tolerance=(BitTimeLow>>2);
-                            if(t>(BitTimeLow+tolerance)) BitValue=true;
+                            if(t>(BitTimeLow+tolerance)) BitValue=1;
+                            if(t< ( BitTimeLow>>1) ) BitError=TOSHORT; // SystemOutDec("to short",t);
                     }
-                    state=BITREADY;                 //==> BITSTATE2
+                    state=BITREADY;                 //==> BITREADY
                 }
         	}break;
         	default: state=BITREADY;
         }
+        timeOutCounter++;
+        if( timeOutCounter > TIMEOUTCYCLES)
+        {
+        	BitError=BITTIMEOUT;
+        	state=BITREADY;
+        	//SystemOutDec("----BITTIMEOUT ",t);
+        }
+
         return state;
 }
+/***************************************************************************************
+
+    receiveByte_S()
+
+    output:  state ( BYTEREADY when byte received )
+
+***************************************************************************************/
+
+uint8_t ReceiverData;
+
+#define NUMBEROFBITS 8
+
+uint8_t receiveByte_S(){
+
+	static uint8_t state=BYTEREADY;
+	static uint8_t bitCounter,dat;
+
+	switch(state)
+	{
+		case BYTEREADY:
+		{
+           state=WAITFORSTARTBIT;                          // ==> WAITFORSTARTBIT
+           bitCounter=0;
+		} // fall through
+
+		case WAITFORSTARTBIT:
+		{
+			if(highBitReceived_S()==BITREADY)
+			{
+			   if(BitValue==1) state=RECEIVEBITS;          // ==>RECEIVEBITS
+			}
+		}break;
+
+		case RECEIVEBITS:
+		{
+			if(highBitReceived_S()==BITREADY)
+			{
+				dat=dat<<1;
+				dat=dat|BitValue;
+				bitCounter++;
+				if(bitCounter==NUMBEROFBITS)
+				{
+					state=BYTEREADY;     // ==> RECEIVERREADY
+					ReceiverData=dat;
+				}
+				//ledOn();
+				//ledOff();
+			}
+		}break;
+	}
+	return state;
+}
+/***************************************************************************************
+
+    receiveFrame_S()
+
+    output:  state ( FRAMEREADY when frame received )
+
+***************************************************************************************/
+
+uint8_t FrameData[FRAMESIZE];
+uint8_t FrameError;
+
+uint8_t receiveFrame_S()
+{
+
+	static uint8_t state=FRAMEREADY;
+	static uint8_t byteCounter;
+	static uint16_t timeOutCounter;
+
+	switch(state)
+	{
+		case FRAMEREADY:
+		{
+           state=BITRATEESTIMATION;                          // ==> WAITFORSTARTBIT
+           byteCounter=0;
+           timeOutCounter=0;
+           FrameError=FRAMEOK;
+		} // fall through
+
+		case BITRATEESTIMATION:
+		{
+			if(BrEstimationStateMachine(START)==M1_READY)
+			{
+				timeOutCounter=0;
+				state=RECEIVEBYTES;          // ==>RECEIVEBITS
+			}
+		}break;
+
+		case RECEIVEBYTES:
+		{
+			if(receiveByte_S()==BYTEREADY)
+			{
+				FrameData[byteCounter]=ReceiverData;
+				byteCounter++;
+				if(byteCounter==FRAMESIZE)
+				{
+					state=FRAMEREADY;     // ==> RECEIVERREADY
+				}
+			}
+		}break;
+	}
+    timeOutCounter++;
+    if( timeOutCounter > TIMEOUTCYCLES)
+    {
+    	FrameError=FRAMETIMEOUT;
+    	state=FRAMEREADY;
+    	//SystemOutDec("----BITTIMEOUT ",t);
+    }
+	return state;
+}
+
+
+
+
+
 

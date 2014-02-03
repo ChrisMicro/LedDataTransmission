@@ -25,8 +25,34 @@ extern "C"
 	enum bitState { BITREADY,BITSTATE1,BITSTATE2 };
 	extern uint8_t BitValue;
 
+	#define BITOK 0
+	#define BITTIMEOUT 1
+	#define TOSHORT 2
+
+	extern uint8_t BitError;
+
 	state_t BrEstimationStateMachine(command_t command);
 	enum bitState highBitReceived_S(void);
+
+	#define BYTEREADY 0
+	#define WAITFORSTARTBIT 1
+	#define RECEIVEBITS 2
+
+	extern uint8_t ReceiverData;
+	uint8_t receiveByte_S(void);
+
+	#define FRAMEOK 0
+	#define FRAMETIMEOUT 1
+
+	#define FRAMEREADY          0
+	#define BITRATEESTIMATION   1
+	#define RECEIVEBYTES        2
+
+	#define FRAMESIZE 11
+
+	extern uint8_t FrameData[FRAMESIZE];
+	extern uint8_t FrameError;
+	uint8_t receiveFrame_S(void);
 
 #endif // __DECODERSTATEMACHINE__
 
