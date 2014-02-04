@@ -22,7 +22,7 @@ extern "C"
 	typedef uint8_t state_t;
 	typedef uint8_t command_t;
 
-	enum bitState { BITREADY,BITSTATE1,BITSTATE2 };
+	enum bitState { BITREADY,BITSTART,BITEND };
 	extern uint8_t BitValue;
 
 	#define BITOK 0

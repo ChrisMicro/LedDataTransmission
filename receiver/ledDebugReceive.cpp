@@ -27,6 +27,8 @@ Description : 	Data transmission by a LED.
 #include "mc_io.h"
 #include "decoderStateMachine.h"
 #include "stdlib.h"
+#include "../common/crc8.h"
+
 #define LED0 8
 #define LED1 9
 #define LED2 10
@@ -70,7 +72,6 @@ void setup()
 	// Timer 2 normal mode, clk/64, count up from 0 to 255
 	// ==> timer overflow frequency @16MHz= 16MHz/64/256=970,56Hz
 	// = 1024us
-
 	TCCR2B= _BV(CS22);
 
 	// initialize the digital pin as an output.
@@ -126,10 +127,14 @@ void loop()
 	{
 		while(receiveFrame_S()!=FRAMEREADY);
 		if(FrameError!=FRAMEOK) Serial.println("Frame Timeout");
-		for(n=0;n<10;n++){
+		for(n=0;n<11;n++){
 			Serial.print(FrameData[n],HEX);Serial.print(" ");
 		}
+		Serial.print("- ");
+		Serial.print(crc8(FrameData+1,10),HEX);
+		if(crc8(FrameData+1,10)!=FrameData[0])Serial.print("crc error");
 		Serial.println(" ");
+
 	}
 	while(1)
 	{

@@ -28,6 +28,7 @@ Description : Data transmission by a LED.
 #include "signal.h"
 #include "mc_io.h"
 #include "senderSTM.h"
+#include "../common/crc8.h"
 
 void setup()
 {
@@ -45,33 +46,22 @@ void sendWithStateMachine(uint8_t *data, uint8_t datalen)
 		delayMicroseconds(BITTIME_US/2);
 	}while( sendFrame_S( data, datalen) != FRAMEREADY );
 }
-
+// add crc to frame
+void sendFrame(uint8_t *data, uint8_t datalen)
+{
+	data[0]=0;
+	data[0]=crc8(data,datalen);
+	sendWithStateMachine(data, datalen);
+}
 void loop()
 {
-	/*
-	while(1)
-	{
-		do
-		{
-			delayMicroseconds(BITTIME_US/2);
-		}
-		while(sendBit_S(0)!=BITREADY);
-		do
-		{
-			delayMicroseconds(BITTIME_US/2);
-		}
-		while(sendBit_S(1)!=BITREADY);
-		//while(sendBit_S(1)!=BITREADY)delayMicroseconds(BITTIME_US/2);
-		//while(sendBit_S(1)!=BITREADY)delayMicroseconds(BITTIME_US/2);
-	}*/
-    // blink one time
-    //ledOn();
-    //delay(20);
+
     ledOff();
     delay(50);
 
     //sendDataFrame(Data,sizeof(Data));
-    sendWithStateMachine(Data,sizeof(Data));
+    //sendWithStateMachine(Data,sizeof(Data));
+    sendFrame(Data,sizeof(Data));
     Data[2]++; // just to test: increment third byte in data stream
 
     uint8_t n;
@@ -82,7 +72,8 @@ void loop()
       {
         Data[2]=1<<(n&0x3);
         //sendDataFrame(Data,sizeof(Data));
-        sendWithStateMachine(Data,sizeof(Data));
+        //sendWithStateMachine(Data,sizeof(Data));
+        sendFrame(Data,sizeof(Data));
         delay(50);
       }
       Data[2]=0;

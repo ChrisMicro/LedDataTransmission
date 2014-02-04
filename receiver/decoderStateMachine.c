@@ -141,9 +141,9 @@ enum bitState highBitReceived_S()
         {
         	case BITREADY:{
         		timeOutCounter=0;
-        		state=BITSTATE1;  					//==> BITSTATE1
+        		state=BITSTART;  					//==> BITSTATE1
         	}// attention: fallthru !
-        	case BITSTATE1:{
+        	case BITSTART:{
         		BitValue=0;
         		//BitError=BITOK;
 
@@ -155,7 +155,7 @@ enum bitState highBitReceived_S()
                         t=TIMER;
                         TIMER=0; // reset timer
                         p=PINVALUE;
-                		state=BITSTATE2; 	        //==> BITSTATE2
+                		state=BITEND; 	        //==> BITSTATE2
                 	}
                 }
                 else
@@ -166,11 +166,11 @@ enum bitState highBitReceived_S()
                 		t=TIMER;
                 		TIMER=0; // reset timer
                 		p=PINVALUE;
-                		state=BITSTATE2;            //==> BITSTATE2
+                		state=BITEND;            //==> BITSTATE2
                 	}
                 }
         	}break;
-        	case BITSTATE2:{
+        	case BITEND:{
                 if(p!=PINVALUE) // wait for edge
                 {
                 	t=TIMER;
@@ -248,8 +248,8 @@ uint8_t receiveByte_S(){
 					state=BYTEREADY;     // ==> RECEIVERREADY
 					ReceiverData=dat;
 				}
-				//ledOn();
-				//ledOff();
+				ledOn();
+				ledOff();
 			}
 		}break;
 	}
