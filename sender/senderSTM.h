@@ -20,8 +20,9 @@ extern "C"
 
 	enum bitStates { BITREADY=0, LOW_S2, HIGH_S2,HIGH_S3,HIGH_S4 };
 	enum bitStates sendBit_S(uint16_t bit);
-
-	enum SenderStates { FRAMEREADY,FRAMESTART,PREAMPLE,SENDDATA };
+	enum byteSenderStates { READYFORNEXTBYTE,STARTSENDING,SENDING };
+	enum byteSenderStates sendByte_S(uint16_t byte);
+	enum SenderStates { FRAMEREADY,FRAMESTART,PREAMPLE,SENDDATA,FINISHED };
 	enum SenderStates sendFrame_S(uint8_t *data, uint8_t dataLen);
 
 #endif // __SENDERSTM__

@@ -2,11 +2,16 @@
 ============================================================================
 Name :        senderSTM.h
 Author :      ChrisMicro
-Version :
+Version :     V0.2
 Copyright :   GPL license 3
 
-
 Description : sender state machine
+
+Versions:
+V0.1 :        initial version
+V0.2 :        last bit in frame was not transmitted fully
+              additional state added in sendFrame to assure last bit
+              is transmitted
 ============================================================================
 */
 
@@ -75,7 +80,7 @@ enum bitStates sendBit_S(uint16_t bit)
 #define NUMBEROFBITS 9 // start bit + data bits
 #define STARTBIT 0x100 // first bit is start bit
 
-enum byteSenderStates { READYFORNEXTBYTE,STARTSENDING,SENDING };
+
 
 enum byteSenderStates sendByte_S(uint16_t byte)
 {
@@ -92,10 +97,10 @@ enum byteSenderStates sendByte_S(uint16_t byte)
 			// start of first bit
 			// the first bit should be the start bit
 			// the start bit is set in dat before calling this routine ( dat|=0x100 )
-			sendBit_S(dat&(1<<(NUMBEROFBITS-1)));
+			//sendBit_S(dat&(1<<(NUMBEROFBITS-1)));
 			state=STARTSENDING;
 
-		}break;
+		} // fall through
 		case STARTSENDING:{
 			// go on with sending bit
 			if(sendBit_S(dat&(1<<(NUMBEROFBITS-1)))==BITREADY)
@@ -168,11 +173,14 @@ enum SenderStates sendFrame_S(uint8_t *data, uint8_t dataLen)
 		case SENDDATA :{
 			if(sendByte_S(*dataPointer+STARTBIT)==READYFORNEXTBYTE)
 			{
-				dataPointer++;
+                dataPointer++;
 				datLen--;
-				if(datLen==0) state=FRAMEREADY;
+				if(datLen==0) state=FINISHED;
 			}
 		}break;
+        case FINISHED:{
+              state=FRAMEREADY;
+        }break;
 	}
 
 	return state;
