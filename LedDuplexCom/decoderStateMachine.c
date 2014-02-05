@@ -140,7 +140,7 @@ enum bitState highBitReceived_S()
 
         switch(state)
         {
-        	case BITREADY:{
+        	case  BITREADY:{
         		timeOutCounter=0;
         		state=BITSTART;  					//==> BITSTATE1
         	}// attention: fallthru !
@@ -189,16 +189,16 @@ enum bitState highBitReceived_S()
                             if(t>(BitTimeLow+tolerance)) BitValue=1;
                             if(t< ( BitTimeLow>>1) ) BitError=TOSHORT; // SystemOutDec("to short",t);
                     }
-                    state=BITREADY;                 //==> BITREADY
+                    state= BITREADY;                 //==>  BITREADY
                 }
         	}break;
-        	default: state=BITREADY;
+        	default: state= BITREADY;
         }
         timeOutCounter++;
         if( timeOutCounter > TIMEOUTCYCLES)
         {
         	BitError=BITTIMEOUT;
-        	state=BITREADY;
+        	state= BITREADY;
         	//SystemOutDec("----BITTIMEOUT ",t);
         }
 
@@ -260,7 +260,7 @@ uint8_t receiveByte_S(){
 
     receiveFrame_S()
 
-    output:  state ( FRAMEREADY when frame received )
+    output:  state ( RECEIVERREADY when frame received )
 
 ***************************************************************************************/
 
@@ -270,13 +270,13 @@ uint8_t FrameError;
 uint8_t receiveFrame_S()
 {
 
-	static uint8_t state=FRAMEREADY;
+	static uint8_t state=RECEIVERREADY;
 	static uint8_t byteCounter;
 	static uint16_t timeOutCounter;
 
 	switch(state)
 	{
-		case FRAMEREADY:
+		case RECEIVERREADY:
 		{
            state=BITRATEESTIMATION;                          // ==> WAITFORSTARTBIT
            byteCounter=0;
@@ -301,7 +301,7 @@ uint8_t receiveFrame_S()
 				byteCounter++;
 				if(byteCounter==FRAMESIZE)
 				{
-					state=FRAMEREADY;     // ==> RECEIVERREADY
+					state=RECEIVERREADY;     // ==> RECEIVERREADY
 				}
 			}
 		}break;
@@ -310,7 +310,7 @@ uint8_t receiveFrame_S()
     if( timeOutCounter > TIMEOUTCYCLES)
     {
     	FrameError=FRAMETIMEOUT;
-    	state=FRAMEREADY;;
+    	state=RECEIVERREADY;;
     }
 	return state;
 }

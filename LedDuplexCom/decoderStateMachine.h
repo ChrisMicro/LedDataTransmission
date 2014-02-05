@@ -44,11 +44,9 @@ extern "C"
 	#define FRAMEOK 0
 	#define FRAMETIMEOUT 1
 
-	#define FRAMEREADY          0
+	#define RECEIVERREADY       0
 	#define BITRATEESTIMATION   1
 	#define RECEIVEBYTES        2
-
-
 
 	extern uint8_t FrameData[FRAMESIZE];
 	extern uint8_t FrameError;

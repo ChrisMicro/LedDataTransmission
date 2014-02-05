@@ -24,18 +24,21 @@ Description : 	Data transmission by a LED.
 /*
  	Platform: Arduino Uno
  */
+
+#include "stdlib.h"
+
 #include "decoder.h"
 #include "adc.h"
 #include "filter.h"
 
-
 #include "mc_io.h"
 #include "crc8.h"
 
-
 #include "decoderStateMachine.h"
-#include "stdlib.h"
 
+#include "senderSTM.h"
+
+#include "frameFormat.h"
 
 #define LED0 8
 #define LED1 9
@@ -49,7 +52,7 @@ extern "C"
 	//void initLed(){pinMode(ARDUINOLED, OUTPUT);}
 
 	void setLedAsOutput() {DDRC|=0x01;}
-	void setLedAsInput() {DDRC&=~0x01;}
+	void setLedAsInput() {DDRC&=~0x01;PORTC &=~0x01;}
 
 	void ledOn(){PORTC |= 0x01;}
 	void ledOff(){PORTC &=~0x01;}
@@ -98,40 +101,31 @@ void setup()
 	pinMode(LED3, OUTPUT);
 }
 
+//uint8_t TestData[]={0,1,2,3,4,5,6,7,8,9,10};
 
+void sendWithStateMachine(uint8_t *data, uint8_t datalen)
+{
 
+	do
+	{
+		delayMicroseconds(BITTIME_US/2);
+
+	}while( sendFrame_S( data, datalen) != FRAMEREADY );
+}
+// add crc to frame
+
+void sendFrame(uint8_t *data, uint8_t datalen)
+{
+	data[0]=0;
+	data[0]=crc8(data,datalen);
+	sendWithStateMachine(data, datalen);
+}
 void loop()
 {
 	//analogRead(analogInPin);
 	uint8_t n;
 	Serial.println("-1-");
-/*
-	// ADC test
-	while(1)
-	{
-		if(DCremovedPinValue(0)==0)ledOn();
-		else ledOff();
-	}
-	while(1)
-	{
-		ledOn();
-		//delay(500);
-		ledOff();
-		//delay(500);
-		uint16_t x;
-		x=adc_read(0);
-		Serial.print(x);Serial.print("\t");
-		//Serial.println(AC_signal(x));
-		Serial.println(DCremovedPinValue(0));
-	}*/
-	//Serial.println("edge debug, infinite loop, signal out to led");
-	//edgeDebug();
-	//Serial.println("frame start");
-	//receiveFrame();
-	//Serial.println("syncDebug");
-	//syncDebug();
 
-	//Serial.println("waitn for data .... timer counts for low and high signal");
 	Serial.println("wait ...");
 
 	while(BrEstimationStateMachine(START)!=M1_READY);
@@ -141,7 +135,7 @@ void loop()
 	//SystemOutDec("    high us: ",BitTimeHigh/(16e6/64)*1e6);
 	while(1)
 	{
-		while(receiveFrame_S()!=FRAMEREADY);
+		while(receiveFrame_S()!=RECEIVERREADY);
 		if(FrameError!=FRAMEOK) Serial.println("Frame Timeout");
 		for(n=0;n<FRAMESIZE;n++){
 			Serial.print(FrameData[n],HEX);Serial.print(" ");
@@ -153,11 +147,16 @@ void loop()
 		if(FrameError==FRAMEOK)
 		{
 			setLedAsOutput();
-			ledOn();
-			delay(10);
+			sendFrame(FrameData,FRAMESIZE);
+			//ledOn();
+			//delay(100);
 			ledOff();
 			setLedAsInput();
+			//delay(100);
 		}
+		//FrameError=FRAMEOK;
+		//setLedAsInput();
+
 
 	}
 	while(1)

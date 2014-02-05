@@ -126,7 +126,7 @@ state_t BrEstimationStateMachine(command_t command)
 
    highBitReceived_S()
 
-   output:  state ( BITREADY when bit received )
+   output:  state ( SENDERBITREADY when bit received )
 
 ***************************************************************************************/
 //enum bitState { BITREADY,BITSTATE1,BITSTATE2 };
@@ -145,7 +145,7 @@ enum bitState highBitReceived_S()
 
         switch(state)
         {
-        	case BITREADY:{
+        	case SENDERBITREADY:{
         		timeOutCounter=0;
         		state=BITSTART;  					//==> BITSTATE1
         	}// attention: fallthru !
@@ -194,16 +194,16 @@ enum bitState highBitReceived_S()
                             if(t>(BitTimeLow+tolerance)) BitValue=1;
                             if(t< ( BitTimeLow>>1) ) BitError=TOSHORT; // SystemOutDec("to short",t);
                     }
-                    state=BITREADY;                 //==> BITREADY
+                    state=SENDERBITREADY;                 //==> SENDERBITREADY
                 }
         	}break;
-        	default: state=BITREADY;
+        	default: state=SENDERBITREADY;
         }
         timeOutCounter++;
         if( timeOutCounter > TIMEOUTCYCLES)
         {
         	BitError=BITTIMEOUT;
-        	state=BITREADY;
+        	state=SENDERBITREADY;
         	//SystemOutDec("----BITTIMEOUT ",t);
         }
 
@@ -236,7 +236,7 @@ uint8_t receiveByte_S(){
 
 		case WAITFORSTARTBIT:
 		{
-			if(highBitReceived_S()==BITREADY)
+			if(highBitReceived_S()==SENDERBITREADY)
 			{
 			   if(BitValue==1) state=RECEIVEBITS;          // ==>RECEIVEBITS
 			}
@@ -244,7 +244,7 @@ uint8_t receiveByte_S(){
 
 		case RECEIVEBITS:
 		{
-			if(highBitReceived_S()==BITREADY)
+			if(highBitReceived_S()==SENDERBITREADY)
 			{
 				dat=dat<<1;
 				dat=dat|BitValue;
