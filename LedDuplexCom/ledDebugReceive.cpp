@@ -1,5 +1,5 @@
 
-	#include "../common/platform.h"
+#include "platform.h"
 
 #ifdef ARDUINO
 	#ifdef ECLIPSE
@@ -28,13 +28,10 @@ Description : 	Data transmission by a LED.
 #include "adc.h"
 #include "filter.h"
 
-#ifdef ECLIPSE
-   #include "../common/mc_io.h"
-   #include "../common/crc8.h"
-#else
-   #include "mc_io.h"
-   #include "crc8.h"
-#endif
+
+#include "mc_io.h"
+#include "crc8.h"
+
 
 #include "decoderStateMachine.h"
 #include "stdlib.h"

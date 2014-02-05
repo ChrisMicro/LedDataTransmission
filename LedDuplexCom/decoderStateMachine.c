@@ -19,17 +19,12 @@ Description : data decoder for FSK realized as state machine
 //	uses counter TCC2
 
  */
-	#include "../common/platform.h"
-#ifdef ECLIPSE
 
-	#include "../common/frameFormat.h"
-	#include "../common/mc_io.h"
-#else
-	//#include "platform.h"
-	#include "frameFormat.h"
-#endif
+#include "platform.h"
+#include "frameFormat.h"
 
-//#include "mc_io.h"
+
+#include "mc_io.h"
 
 #include "decoder.h"
 #include "stdint.h"

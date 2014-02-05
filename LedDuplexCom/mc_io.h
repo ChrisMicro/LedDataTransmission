@@ -20,6 +20,9 @@ extern "C"
 	#include "platform.h"
 	#include "stdlib.h"
 
+        #define true ( 1==1 )
+        #define false ( !true )
+
 	#ifdef ATTINY_13
 		#define DEBUGLED 4
 	#else

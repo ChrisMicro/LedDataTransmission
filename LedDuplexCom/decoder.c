@@ -19,12 +19,8 @@ Description : data decoder for FSK coded signals from a digital input pin
 //        uses counter TCC2
 
 */
-	#include "../common/platform.h"
-#ifdef ECLIPSE
-	#include "../common/mc_io.h"
-#else
-	#include "mc_io.h"
-#endif
+#include "platform.h"
+#include "mc_io.h"
 
 #include "decoder.h"
 #include "stdint.h"

@@ -11,7 +11,7 @@ Description : micontroller in/output abstraction
 */
 #include "platform.h"
 #include "mc_io.h"
-#include "Arduino.h"
+
 
 #if defined( ATTINY_13) || defined ( ATMEGA_88_168_328 )
 // make shure that your compiler environment sets F_CPU

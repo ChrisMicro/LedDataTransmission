@@ -22,6 +22,8 @@ extern "C"
 
 	//#define ATMEGA_88_168_328
 	#define ARDUINO
+    #define ECLIPSE  // if developing in eclipse some additional includes are necessara
+                     // for Arduino
 
 #endif // __PLATFORM__
 
