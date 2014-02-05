@@ -32,7 +32,8 @@ Description : Data transmission by a LED.
 
 void setup()
 {
-	initLed();
+	//initLed();
+	setLedAsOutput();
 }
 
 uint8_t Data[]={ 0,0xff,0,0xaa,0x55,0,1,2,3,4,0x80 };

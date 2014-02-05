@@ -40,10 +40,15 @@ extern "C"
 
 		#define HALFBITDELAY _delay_us(1e6/BAUD/2)
 
-		#define initLed() { DDRB  = ( 1 << DEBUGLED );} // set the led pin to output
+		//#define initLed() { DDRB  = ( 1 << DEBUGLED );} // set the led pin to output
 
-		#define ledOn() {PORTB |= (1 << DEBUGLED );}
-		#define ledOff() {PORTB &=~ (1 << DEBUGLED );}
+		//#define ledOn() {PORTB |= (1 << DEBUGLED );}
+		//#define ledOff() {PORTB &=~ (1 << DEBUGLED );}
+		#define ledOn() {PORTC |= 0x01;}
+		#define ledOff() {PORTC &=~0x01;}
+
+		#define setLedAsOutput() {DDRC|=0x01;}
+		#define setLedAsInput() {DDRC&=~0x01;}
 
 		#define toggleLed() {PORTB ^= (1 << DEBUGLED );} // toggle led pin by xor
 

@@ -27,9 +27,9 @@ Description : data decoder for FSK coded signals from a digital input pin
 // debug pulse
 void pulse()
 {
-         ledOn();
+         debugLedOn();
          delayMicroseconds(20);
-         ledOff();
+         debugLedOff();
 }
 uint8_t BitTimeLow=0;
 uint8_t BitTimeHigh=0;

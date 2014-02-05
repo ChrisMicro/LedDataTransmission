@@ -29,6 +29,7 @@ Description : 	Data transmission by a LED.
 #include "stdlib.h"
 #include "../common/crc8.h"
 
+
 #define LED0 8
 #define LED1 9
 #define LED2 10
@@ -36,14 +37,21 @@ Description : 	Data transmission by a LED.
 
 extern "C"
 {
-	void ledOn(){digitalWrite(ARDUINOLED, HIGH);}
-	void ledOff()  {digitalWrite(ARDUINOLED, LOW);}
-	void initLed(){pinMode(ARDUINOLED, OUTPUT);}
+	void debugLedOn(){digitalWrite(ARDUINOLED, HIGH);}
+	void debugLedOff()  {digitalWrite(ARDUINOLED, LOW);}
+	//void initLed(){pinMode(ARDUINOLED, OUTPUT);}
+
+	void setLedAsOutput() {DDRC|=0x01;}
+	void setLedAsInput() {DDRC&=~0x01;}
+
+	void ledOn(){PORTC |= 0x01;}
+	void ledOff(){PORTC &=~0x01;}
+
 	void toggleLed()
 	{
 		static int state=0;
-		if(state==0) digitalWrite(ARDUINOLED, LOW);
-		else digitalWrite(ARDUINOLED, HIGH);
+		if(state==0) ledOff();
+		else ledOn();
 		state^=0x01;
 	}
 	void SystemOutText(char * str){
@@ -56,9 +64,11 @@ extern "C"
 	}
 }
 
+
 void setup()
 {
-	initLed();
+	//initLed();
+	setLedAsInput();
 	//initPort();
 	adc_init();
 
@@ -134,6 +144,14 @@ void loop()
 		Serial.print(crc8(FrameData+1,10),HEX);
 		if(crc8(FrameData+1,10)!=FrameData[0])Serial.print("crc error");
 		Serial.println(" ");
+		if(FrameError==FRAMEOK)
+		{
+			setLedAsOutput();
+			ledOn();
+			delay(10);
+			ledOff();
+			setLedAsInput();
+		}
 
 	}
 	while(1)

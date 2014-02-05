@@ -248,8 +248,8 @@ uint8_t receiveByte_S(){
 					state=BYTEREADY;     // ==> RECEIVERREADY
 					ReceiverData=dat;
 				}
-				ledOn();
-				ledOff();
+				debugLedOn();
+				debugLedOff();
 			}
 		}break;
 	}
