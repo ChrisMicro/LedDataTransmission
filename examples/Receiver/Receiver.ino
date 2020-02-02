@@ -24,7 +24,7 @@
   schematic:
 
   GND ==> - LED + ==> Arduino A0
-  
+
 */
 
 #include "LedDataTransmission.h"
@@ -54,11 +54,18 @@ void loop()
 
   for (n = 0; n < FRAMESIZE; n++)
   {
-    Serial.print(FrameData[n], HEX);
-    Serial.print("\t");
+    Serial.print(FrameData[n], HEX); Serial.print(",");
   }
-  Serial.print(  " low: "); Serial.print(BitTimeLow);
-  Serial.print("\t high: ");  Serial.println(BitTimeHigh);
+  Serial.print("  ");
+
+  for (n = 0; n < FRAMESIZE; n++)
+  {
+    char c = FrameData[n];
+    if (c >= ' ' && c <= '~') Serial.write(c);
+    else Serial.write(".");
+  }
+
+  Serial.println("");
 
 }
 

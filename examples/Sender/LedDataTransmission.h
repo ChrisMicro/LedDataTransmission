@@ -19,12 +19,15 @@
 #include "mc_io.h"
 #include "senderSTM.h"
 
-class LedDataTransmission {
+class LedDataTransmission
+{
   public:
     /* Constructor */
     LedDataTransmission(void);
     void beginSender(void);
     void send(uint8_t *data, uint8_t datalen); // maximum lenght is defined in FRAMESIZE
+    void send(String str);
+    void send(int value);
 
 };
 
