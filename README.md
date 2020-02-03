@@ -19,3 +19,4 @@ On the receiver side you should connect an LED with the Anode to the analog inpu
 
 You should use ultrabright LEDs. Best working are red and orange LEDs.
 
+Here is a [picture with two arduinos](https://github.com/ChrisMicro/LedDataTransmission/blob/master/doc/arduinoLed.png)

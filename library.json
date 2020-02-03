@@ -1,0 +1,20 @@
+{
+  "name": "LedDataTransmission",
+  "keywords": "led data transmission",
+  "description": "use an LED as sender and receiver for digital data transmission",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/ChrisMicro/LedDataTransmission"
+  },
+  "authors":
+  [
+    {
+      "name": "ChrisMicro",
+      "maintainer": true
+    }
+  ],
+  "version": "0.1",
+  "frameworks": ["arduino"],
+  "platforms": "Arduino Uno, Arduino Nano"
+}

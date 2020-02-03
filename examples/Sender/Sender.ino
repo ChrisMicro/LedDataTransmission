@@ -11,11 +11,11 @@
   Description : Data transmission by a LED.
 
 
-  connect an ultrabright red led to pin13 in series with a resistor of 270Ohm
+  connect an ultrabright red led to analog pin A0 in series with a resistor of 270Ohm
 
   schematic:
 
-  Arduino Pin13 ==> + Led - ==> R270 OHM ==> GND
+  Arduino A0 ==> + Led - ==> R270 OHM ==> GND
 
   ============================================================================
 
@@ -27,20 +27,22 @@ LedDataTransmission LedCom;
 
 void setup()
 {
-  LedCom.beginSender();
+  LedCom.begin();
 }
 
 int Counter = 0;
 
 void loop()
 {
-
+  LedCom.send("hello");
   ledOff();
   delay(50);
-  LedCom.send("hello");
-  delay(50);
-  LedCom.send(Counter++);
-  delay(1000);
 
+  for(int n=0;n<10;n++)
+  {
+    LedCom.send(Counter++);
+    ledOff();
+    delay(50);
+  }
 }
 

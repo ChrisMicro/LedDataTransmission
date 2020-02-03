@@ -18,11 +18,20 @@ extern "C"
 
 	#include <stdlib.h>
 
-	enum bitStates { BITREADY=0, LOW_S2, HIGH_S2,HIGH_S3,HIGH_S4 };
+	enum bitStates { SENDERBITREADY=0, LOW_S2, HIGH_S2,HIGH_S3,HIGH_S4 };
 	enum bitStates sendBit_S(uint16_t bit);
 
-	enum SenderStates { FRAMEREADY,FRAMESTART,PREAMPLE,SENDDATA };
-	enum SenderStates sendFrame_S(uint8_t *data, uint8_t dataLen);
+	enum byteSenderStates { READYFORNEXTBYTE,STARTSENDING,SENDING };
+	enum byteSenderStates sendByte_S(uint16_t value);
+	//enum SenderStates { FRAMEREADY=0,FRAMESTART,PREAMPLE,SENDDATA,FINISHED };
+
+	#define FRAMEREADY 0
+	#define	FRAMESTART 1
+	#define	PREAMPLE 2
+	#define	SENDDATA 3
+	#define	FINISHED 4
+
+	uint8_t sendFrame_S(uint8_t *data, uint8_t dataLen);
 
 #endif // __SENDERSTM__
 

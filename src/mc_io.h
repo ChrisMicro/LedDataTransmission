@@ -18,12 +18,23 @@ extern "C"
 #define __MC_IO__
 
 	#include "platform.h"
+	#include "stdlib.h"
+
+    #define true ( 1==1 )
+    #define false ( !true )
 
 	#ifdef ATTINY_13
 		#define DEBUGLED 4
 	#else
 		#define DEBUGLED 5
 	#endif
+
+	void ledOn(void);
+	void ledOff(void);
+	void initLed(void);
+	void toggleLed(void);
+	void SystemOutText(char * str);
+	void SystemOutDec(char* str, int);
 
 	#if defined( ATTINY_13) || defined ( ATMEGA_88_168_328 )
 	// make shure that your compiler environment sets F_CPU
@@ -40,31 +51,10 @@ extern "C"
 
 		#define HALFBITDELAY _delay_us(1e6/BAUD/2)
 
-		#define initLed() { DDRB  = ( 1 << DEBUGLED );} // set the led pin to output
-
-		#define ledOn() {PORTB |= (1 << DEBUGLED );}
-		#define ledOff() {PORTB &=~ (1 << DEBUGLED );}
-
-		#define toggleLed() {PORTB ^= (1 << DEBUGLED );} // toggle led pin by xor
-
-		#define delay(x)	_delay_ms(x)
-		#define delayMicroseconds(x) _delay_us(x)
-
 	#else
 
 		#define ARDUINOLED 13
 		#define HALFBITDELAY delayMicroseconds(1e6/BAUD/2)
-
-		inline void ledOn(){digitalWrite(ARDUINOLED, HIGH);}
-		inline void ledOff()  {digitalWrite(ARDUINOLED, LOW);}
-		inline void initLed(){pinMode(ARDUINOLED, OUTPUT);}
-		void toggleLed()
-		{
-			static int state=0;
-			if(state==0) digitalWrite(ARDUINOLED, LOW);
-			else digitalWrite(ARDUINOLED, HIGH);
-			state^=0x01;
-		}
 
 	#endif
 

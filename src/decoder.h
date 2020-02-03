@@ -23,19 +23,22 @@ extern "C"
 
 #ifndef __DECODER_
 #define __DECODER_
+	#include "stdint.h"
 
-	// you can use the adc sitnal as input
+
+	#include "frameFormat.h"
+
+
+	// you can use the adc signal as input
 	// this will enable DC suppression without
 	// external capacitor
 	// ADC-sampling is slower than direct
 	// digital pin sampling
 	#define INPUTFROMADC
 
-	#define DEBUGLED 5
-	//#define DEBUGLED 4
-
-	#define BAUD 4800
 	#define TIMER TCNT2 // we use timer2 for measuring time
+
+
 
 #ifdef ATMEGA_88_168_328
 /*
@@ -59,17 +62,12 @@ extern "C"
 	#define delay(x)	_delay_ms(x);
 
 #else
-	#include "Arduino.h"
+
 	#include "adc.h"
 
-	#define ARDUINOLED 13
-	#define HALFBITDELAY delayMicroseconds(1e6/BAUD/2)
+	//#define ARDUINOLED 13
+	//#define HALFBITDELAY delayMicroseconds(1e6/BAUD/2)
 
-	inline void ledOn(){digitalWrite(ARDUINOLED, HIGH);}
-	inline void ledOff()  {digitalWrite(ARDUINOLED, LOW);}
-	inline void initLed(){pinMode(ARDUINOLED, OUTPUT);}
-
-	inline void initPort(){pinMode(12, INPUT);}
 	#define INPUTAUDIOPIN (1<<PB4) // PB4 is Arduino Pin Number 12
 
 	#ifdef INPUTFROMADC
@@ -83,15 +81,9 @@ extern "C"
 
 #endif
 
+	extern uint8_t HighTakesLonger;
 	extern uint8_t BitTimeLow;
 	extern uint8_t BitTimeHigh;
-
-	#define FRAMESIZE 10
-
-	void toggleLed(void);
-	void ledOn(void);
-	void ledOff(void);
-	void bitRateEstimation(void);
 
 	uint8_t receiveFrame(uint8_t * frameData);
 

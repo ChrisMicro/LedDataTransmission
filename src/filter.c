@@ -1,10 +1,37 @@
+/*
+============================================================================
+
+Name :      filter.c
+Author :    ChrisMicro
+Version :
+Copyright : GPL license 3
+
+Date :      February 2014
+
+Description : digital filter routines
+
+============================================================================
+*/
 #include "filter.h"
 
+/***************************************************************************************
 
-// y2=a*x+(1-a)*y1, a in 1/65536
-// Filter += (ADC Wert-Filter) / K;
-// K * Abtastzeit = Zeitkonstate des Filters 1. Ordnung.
-// ==> a=tau*65536/fab
+	uint16_t lowPassUint16(uint16_t x)
+
+	Integer IIR one pole low pass filter.
+
+	y2=a*x+(1-a)*y1, a in 1/65536
+	Filter += (ADC Wert-Filter) / K;
+	K * Abtastzeit = Zeitkonstate des Filters 1. Ordnung.
+	==> a=tau*65536/fab
+
+	input: x signall
+	outpu: y signal
+
+	attention: the filter can have only one caller due to static memory
+
+***************************************************************************************/
+
 uint16_t lowPassUint16(uint16_t x)
 {
    uint16_t a=1000; // range of a 0..65536 ==> 1..0

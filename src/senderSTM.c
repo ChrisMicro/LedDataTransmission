@@ -2,17 +2,23 @@
 ============================================================================
 Name :        senderSTM.h
 Author :      ChrisMicro
-Version :
+Version :     V0.2
 Copyright :   GPL license 3
 
-
 Description : sender state machine
+
+Versions:
+V0.1 :        initial version
+V0.2 :        last bit in frame was not transmitted fully
+              additional state added in sendFrame to assure last bit
+              is transmitted
 ============================================================================
 */
 
 #include <stdio.h>
 #include "mc_io.h"
 #include "senderSTM.h"
+#include "frameFormat.h"
 
 #define SYSTEMOUTCHAR(c) //putchar(c)
 
@@ -22,7 +28,7 @@ Description : sender state machine
 
     send one bit state machine
 
-	//enum bitStates { BITREADY=0, LOW_S2, HIGH_S2,HIGH_S3,HIGH_S4 };
+	//enum bitStates { SENDERBITREADY=0, LOW_S2, HIGH_S2,HIGH_S3,HIGH_S4 };
 
     input: bit value
 
@@ -30,11 +36,11 @@ Description : sender state machine
 
 enum bitStates sendBit_S(uint16_t bit)
 {
-	static enum bitStates state=BITREADY;
+	static enum bitStates state=SENDERBITREADY;
 
 	switch(state)
 	{
-		case BITREADY:{
+		case SENDERBITREADY:{
 			SYSTEMOUTCHAR(' ');
 			ledOff();
 			if(bit==0)	    state=LOW_S2;
@@ -43,7 +49,7 @@ enum bitStates sendBit_S(uint16_t bit)
 
 		// low bit states
 		case LOW_S2:{
-			ledOn();		state=BITREADY; // final state go back to ready
+			ledOn();		state=SENDERBITREADY; // final state go back to ready
 		}break;
 		// =================================
 
@@ -56,7 +62,7 @@ enum bitStates sendBit_S(uint16_t bit)
 			ledOn();		state=HIGH_S4;
 		}break;
 		case HIGH_S4:{
-			ledOn();		state=BITREADY; // final state go back to ready
+			ledOn();		state=SENDERBITREADY; // final state go back to ready
 		}break;
 
 		// =================================
@@ -75,9 +81,7 @@ enum bitStates sendBit_S(uint16_t bit)
 #define NUMBEROFBITS 9 // start bit + data bits
 #define STARTBIT 0x100 // first bit is start bit
 
-enum byteSenderStates { READYFORNEXTBYTE,STARTSENDING,SENDING };
-
-enum byteSenderStates sendByte_S(uint16_t byte)
+enum byteSenderStates sendByte_S(uint16_t value)
 {
 	static enum byteSenderStates state=READYFORNEXTBYTE;
 	static uint8_t bitCounter;
@@ -87,18 +91,18 @@ enum byteSenderStates sendByte_S(uint16_t byte)
 	{
 		case READYFORNEXTBYTE:{
 			bitCounter=8;
-			dat=byte;
+			dat=value;
 
 			// start of first bit
 			// the first bit should be the start bit
 			// the start bit is set in dat before calling this routine ( dat|=0x100 )
-			sendBit_S(dat&(1<<(NUMBEROFBITS-1)));
+			//sendBit_S(dat&(1<<(NUMBEROFBITS-1)));
 			state=STARTSENDING;
 
-		}break;
+		} // fall through
 		case STARTSENDING:{
 			// go on with sending bit
-			if(sendBit_S(dat&(1<<(NUMBEROFBITS-1)))==BITREADY)
+			if(sendBit_S(dat&(1<<(NUMBEROFBITS-1)))==SENDERBITREADY)
 			{
 				dat=dat<<1; // first bit is sent
 				state=SENDING;
@@ -106,8 +110,10 @@ enum byteSenderStates sendByte_S(uint16_t byte)
 		}break;
 
 		case SENDING:{
-			if(sendBit_S(dat&(1<<(NUMBEROFBITS-1)))==BITREADY)
+
+			if(sendBit_S(dat&(1<<(NUMBEROFBITS-1)))==SENDERBITREADY)
 			{
+
 				dat=dat<<1;
 				bitCounter--;
 				if(bitCounter==0)
@@ -132,11 +138,9 @@ enum byteSenderStates sendByte_S(uint16_t byte)
 ***************************************************************************************/
 //enum SenderStates { FRAMEREADY,FRAMESTART,PREAMPLE,SENDDATA };
 
-#define PREAMPLELENGTH 5 // length of preample in bytes
-
-enum SenderStates sendFrame_S(uint8_t *data, uint8_t dataLen)
+uint8_t sendFrame_S(uint8_t *data, uint8_t dataLen)
 {
-	static enum SenderStates state=FRAMEREADY;
+	static uint8_t state=FRAMEREADY;
 	static uint8_t *dataPointer;
 	static uint8_t datLen;
 	static uint8_t preampleCounter;
@@ -153,13 +157,16 @@ enum SenderStates sendFrame_S(uint8_t *data, uint8_t dataLen)
 		}break;
 
 		case FRAMESTART:{
+
 			sendByte_S(0); // go on with sending first bit
 			state=PREAMPLE;
 		}break;
 
 		case PREAMPLE:{
+
 			if(sendByte_S(0)==READYFORNEXTBYTE)
 			{
+
 				preampleCounter--;
 				if(preampleCounter==0)	state=SENDDATA;
 			}
@@ -168,11 +175,14 @@ enum SenderStates sendFrame_S(uint8_t *data, uint8_t dataLen)
 		case SENDDATA :{
 			if(sendByte_S(*dataPointer+STARTBIT)==READYFORNEXTBYTE)
 			{
-				dataPointer++;
+                dataPointer++;
 				datLen--;
-				if(datLen==0) state=FRAMEREADY;
+				if(datLen==0) state=FINISHED;
 			}
 		}break;
+        case FINISHED:{
+              state=FRAMEREADY;
+        }break;
 	}
 
 	return state;
